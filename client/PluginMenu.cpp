@@ -735,6 +735,8 @@ void PluginMenu::Render() noexcept
                 {
                     const auto& blackList = BlackList::RequestBlackList();
 
+                    std::string playerToUnlock;
+
                     for (const auto& playerInfo : blackList)
                     {
                         if (!(PluginMenu::nBuffer[0] == '\0' || (iPlayerId != SV::kNonePlayer ? playerInfo.playerId == iPlayerId :
@@ -747,8 +749,8 @@ void PluginMenu::Render() noexcept
 
                         if (ImGui::Button("##label", { listWidth, ImGui::GetFontSize() + 2.f }))
                         {
-                            // Remove player from black list
-                            BlackList::UnlockPlayer(playerInfo.playerName);
+                            // only marks; the actual removal happens after finishing iterating
+                            playerToUnlock = playerInfo.playerName;
                         }
 
                         ImGui::PopID();
@@ -771,6 +773,10 @@ void PluginMenu::Render() noexcept
                             ImGui::GetWindowDrawList()->AddCircleFilled(cPos, ImGui::GetFontSize() / 4.f, 0xff7dfe3f);
                         else ImGui::GetWindowDrawList()->AddCircle(cPos, ImGui::GetFontSize() / 4.f, 0xff808080);
                     }
+
+                    // remove only after the entire loop has finished, to avoid invalidating the iterator
+                    if (!playerToUnlock.empty())
+                        BlackList::UnlockPlayer(playerToUnlock);
 
                     ImGui::EndChildFrame();
                 }

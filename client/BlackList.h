@@ -80,6 +80,7 @@ private:
     static bool initStatus;
 
     static std::list<LockedPlayer> blackList;
+    static std::string currentFilePath;
 
     static Memory::JumpHookPtr createPlayerInPoolHook;
     static Memory::JumpHookPtr deletePlayerInPoolHook;

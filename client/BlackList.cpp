@@ -19,12 +19,23 @@ BlackList::LockedPlayer::LockedPlayer(std::string playerName, const WORD playerI
 
 bool BlackList::Load(const std::string& filePath)
 {
+    BlackList::currentFilePath = filePath;
+
     constexpr auto kFileMode = std::ios::in;
 
     std::ifstream blackListFile { filePath, kFileMode };
 
     if (!blackListFile || !blackListFile.is_open())
-        return false;
+    {
+        // text file don't exist, create a new one
+        std::ofstream newFile{ filePath, std::ios::out };
+
+        if (!newFile || !newFile.is_open())
+            return false;
+
+        BlackList::blackList.clear();
+        return true;
+    }
 
     BlackList::blackList.clear();
 
@@ -146,6 +157,9 @@ void BlackList::LockPlayer(const WORD playerId)
                         "(id:%hu;nick:%s) to blacklist...", playerId, playerName);
 
                     BlackList::blackList.emplace_front(playerName, playerId);
+
+                    if (!BlackList::Save(BlackList::currentFilePath))
+                        Logger::LogToFile("[sv:err:blacklist:lockplayer] : failed to save blacklist file");
                 }
             }
         }
@@ -161,6 +175,9 @@ void BlackList::UnlockPlayer(const WORD playerId)
     {
         return playerId == object.playerId;
     });
+
+    if (!BlackList::Save(BlackList::currentFilePath))
+        Logger::LogToFile("[sv:err:blacklist:unlockplayer] : failed to save blacklist file");
 }
 
 void BlackList::UnlockPlayer(const std::string& playerName)
@@ -172,6 +189,9 @@ void BlackList::UnlockPlayer(const std::string& playerName)
     {
         return playerName == object.playerName;
     });
+
+    if (!BlackList::Save(BlackList::currentFilePath))
+        Logger::LogToFile("[sv:err:blacklist:unlockplayer] : failed to save blacklist file");
 }
 
 const std::list<BlackList::LockedPlayer>& BlackList::RequestBlackList() noexcept
@@ -250,6 +270,7 @@ BOOL __thiscall BlackList::DeletePlayerFromPoolHook(SAMP::CPlayerPool* const _th
 bool BlackList::initStatus { false };
 
 std::list<BlackList::LockedPlayer> BlackList::blackList;
+std::string BlackList::currentFilePath;
 
 Memory::JumpHookPtr BlackList::createPlayerInPoolHook { nullptr };
 Memory::JumpHookPtr BlackList::deletePlayerInPoolHook { nullptr };
