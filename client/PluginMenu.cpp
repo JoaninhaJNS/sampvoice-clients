@@ -687,8 +687,11 @@ void PluginMenu::Render() noexcept
 
                                         ImGui::SetCursorPos({ oldCurPos.x + 5.f, oldCurPos.y + 1.f });
                                         if (auto stPlayer = SAMP::pNetGame()->GetPlayerPool()->GetPlayer(playerId))
-                                            ImGui::TextColored(ImGui::ColorConvertU32ToFloat4(htonl(stPlayer->GetColorAsRGBA() |
-                                                0xff000000)), "(%hu) %s", playerId, playerName);
+                                        {
+                                            ImVec4 nameColor = ImGui::ColorConvertU32ToFloat4(htonl(stPlayer->GetColorAsRGBA() | 0x000000ff));
+                                            nameColor.w = 1.0f;
+                                            ImGui::TextColored(nameColor, "(%hu) %s", playerId, playerName);
+                                        }
                                         else ImGui::Text("(%hu) %s", playerId, playerName);
                                         ImGui::PopID();
                                     }
@@ -760,8 +763,11 @@ void PluginMenu::Render() noexcept
                         if (playerInfo.playerId != SV::kNonePlayer)
                         {
                             if (auto stPlayer = SAMP::pNetGame()->GetPlayerPool()->GetPlayer(playerInfo.playerId))
-                                ImGui::TextColored(ImGui::ColorConvertU32ToFloat4(htonl(stPlayer->GetColorAsRGBA())),
-                                    "%s (%hu)", playerInfo.playerName.c_str(), playerInfo.playerId);
+                            {
+                                ImVec4 nameColor = ImGui::ColorConvertU32ToFloat4(htonl(stPlayer->GetColorAsRGBA()));
+                                nameColor.w = 1.0f;
+                                ImGui::TextColored(nameColor, "%s (%hu)", playerInfo.playerName.c_str(), playerInfo.playerId);
+                            }
                             else ImGui::Text("%s (%hu)", playerInfo.playerName.c_str(), playerInfo.playerId);
                         }
                         else ImGui::TextDisabled("%s", playerInfo.playerName.c_str());
