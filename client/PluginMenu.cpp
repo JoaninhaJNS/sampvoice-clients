@@ -15,12 +15,14 @@
 #include <util/ImGuiUtil.h>
 #include <util/GameUtil.h>
 #include <util/Logger.h>
+#include <util/Path.h>
 
 #include "BlackList.h"
 #include "SpeakerList.h"
 #include "MicroIcon.h"
 #include "Playback.h"
 #include "Record.h"
+#include "PluginConfig.h"
 
 bool PluginMenu::Init(IDirect3DDevice9* const pDevice, const AddressesBase& const addrBase,
     const Resource& const rShader, const Resource& const rLogo, const Resource& const rFont) noexcept
@@ -324,6 +326,9 @@ void PluginMenu::Hide() noexcept
     PluginMenu::nBuffer[0] = '\0';
     PluginMenu::bCheckDevice = false;
     Record::StopChecking();
+
+    // save plugin config on closing menu
+    PluginConfig::Save(Path() / SV::kConfigFileName);
 
     PluginMenu::showStatus = false;
 }
