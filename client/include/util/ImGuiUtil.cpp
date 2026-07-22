@@ -53,6 +53,7 @@ bool ImGuiUtil::Init(IDirect3DDevice9* const pDevice) noexcept
 
     ImGui::GetIO().IniFilename = NULL;
     ImGui::GetIO().ConfigFlags |= ImGuiConfigFlags_NavEnableKeyboard;
+    ImGui::GetIO().ConfigFlags |= ImGuiConfigFlags_NoMouseCursorChange;
 
     ImGuiUtil::win32loadStatus = ImGui_ImplWin32_Init(hDeviceWindow);
     ImGuiUtil::dx9loadStatus = ImGui_ImplDX9_Init(pDevice);
